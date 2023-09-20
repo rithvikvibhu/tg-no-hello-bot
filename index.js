@@ -29,7 +29,7 @@ bot.on(message('text'), async (ctx) => {
     const messageId = ctx.message.message_id;
     
     // Check if the message is non-"Hi"
-    if (!/^hi|hey|hello$/i.test(message)) {
+    if (!/^(hi|hey|hello)$/i.test(message)) {
         // Reset the hiCount if the user sends a non-greeting message
         await db.run("DELETE FROM users WHERE user_id = ? AND group_id = ?", [userId, groupId]);
         return;
