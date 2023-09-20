@@ -34,6 +34,8 @@ bot.on(message('text'), async (ctx) => {
         await db.run("DELETE FROM users WHERE user_id = ? AND group_id = ?", [userId, groupId]);
         return;
     }
+    
+    if (ctx.chat.type === 'private' || await isAdmin(ctx)) return;
 
     await ctx.deleteMessage(messageId);
 
@@ -61,6 +63,34 @@ bot.on(message('text'), async (ctx) => {
     // Reply with the link when the user says "Hi"
     ctx.reply(`Hey @${username}: To learn more about why we discourage saying "Hi" in the group, visit: https://nohello.net`);
 });
+
+// Cache to store admin status with a 10-minute expiration
+const adminStatusCache = new Map();
+
+// Function to check if a user is an admin
+async function isAdmin(ctx) {
+  const chatId = ctx.chat.id;
+  const userId = ctx.from.id;
+
+  // Check if the result is cached
+  if (adminStatusCache.has(userId)) {
+    return adminStatusCache.get(userId);
+  }
+
+  // Get chat member information for the user
+  const chatMember = await ctx.telegram.getChatMember(chatId, userId);
+
+  // Check if the user is an admin
+  const isAdmin = chatMember.status === 'administrator' || chatMember.status === 'creator';
+
+  // Cache the result for 10 minutes
+  adminStatusCache.set(userId, isAdmin);
+  setTimeout(() => {
+    adminStatusCache.delete(userId);
+  }, 1 * 60 * 1000); // 10 minutes in milliseconds
+
+  return isAdmin;
+}
 
 bot.launch();
 
