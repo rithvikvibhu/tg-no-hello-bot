@@ -61,7 +61,10 @@ bot.on(message('text'), async (ctx) => {
     }
 
     // Reply with the link when the user says "Hi"
-    ctx.reply(`Hey @${username}: To learn more about why we discourage saying "Hi" in the group, visit: https://nohello.net`);
+    const linkMsg = await ctx.reply(`Hey @${username}: To learn more about why we discourage saying "Hi" in the group, visit: https://nohello.net`);
+    setTimeout(async () => {
+        await ctx.deleteMessage(linkMsg.message_id);
+    }, 25 * 1000);
 });
 
 // Cache to store admin status with a 10-minute expiration
@@ -87,7 +90,7 @@ async function isAdmin(ctx) {
   adminStatusCache.set(userId, isAdmin);
   setTimeout(() => {
     adminStatusCache.delete(userId);
-  }, 1 * 60 * 1000); // 10 minutes in milliseconds
+  }, 10 * 60 * 1000); // 10 minutes in milliseconds
 
   return isAdmin;
 }
