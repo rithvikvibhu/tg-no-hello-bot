@@ -1,3 +1,4 @@
+import 'dotenv/config';
 import { Telegraf } from 'telegraf';
 import { message } from 'telegraf/filters';
 import * as sqlite from 'sqlite';
